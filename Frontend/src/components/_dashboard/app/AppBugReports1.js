@@ -55,17 +55,17 @@ export default function AppBugReports1({ handoverData }) {
     //   'width=1000px,height=400px'
     // );
 
-    // const newWindow = window.open(
-    //   'http://35.78.68.113/mpd/DatabasesMobitelProjects/AllMobitelHandoverData',
-    //   'Scope Details',
-    //   'width=1000px,height=400px'
-    // );
-
     const newWindow = window.open(
-      'http://localhost:3001/mpd/DatabasesMobitelProjects/AllMobitelHandoverData',
+      'http://35.78.68.113/mpd/DatabasesMobitelProjects/AllMobitelHandoverData',
       'Scope Details',
       'width=1000px,height=400px'
     );
+
+    // const newWindow = window.open(
+    //   'http://localhost:3001/mpd/DatabasesMobitelProjects/AllMobitelHandoverData',
+    //   'Scope Details',
+    //   'width=1000px,height=400px'
+    // );
     newWindow.arrayData = mobitelTilesData.projectHandOverData;
   };
 

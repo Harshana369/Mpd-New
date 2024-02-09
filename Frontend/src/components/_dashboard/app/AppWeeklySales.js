@@ -54,17 +54,17 @@ export default function AppWeeklySales({ CommissionedData }) {
     //   'width=1000px,height=400px'
     // );
 
-    // const newWindow = window.open(
-    //   `http://35.78.68.113/mpd/DatabasesMobitelProjects/AllMobitelScopeData`,
-    //   'Scope Details',
-    //   'width=1000px,height=400px'
-    // );
-
     const newWindow = window.open(
-      `http://localhost:3001/mpd/DatabasesMobitelProjects/AllMobitelCommissionedData`,
+      `http://35.78.68.113/mpd/DatabasesMobitelProjects/AllMobitelScopeData`,
       'Scope Details',
       'width=1000px,height=400px'
     );
+
+    // const newWindow = window.open(
+    //   `http://localhost:3001/mpd/DatabasesMobitelProjects/AllMobitelCommissionedData`,
+    //   'Scope Details',
+    //   'width=1000px,height=400px'
+    // );
 
     // const newWindow = window.open(
     //   `http://172.22.110.186:8072/mpd/DatabasesMobitelProjects/AllMobitelCommissionedData`,

@@ -48,17 +48,17 @@ export default function AppNewUsers({ onAirData }) {
     //   'width=1000px,height=400px'
     // );
 
-    // const newWindow = window.open(
-    //   'http://35.78.68.113/mpd/DatabasesMobitelProjects/AllMobitelOnAirData',
-    //   'Scope Details',
-    //   'width=1000px,height=400px'
-    // );
-
     const newWindow = window.open(
-      'http://localhost:3001/mpd/DatabasesMobitelProjects/AllMobitelOnAirData',
+      'http://35.78.68.113/mpd/DatabasesMobitelProjects/AllMobitelOnAirData',
       'Scope Details',
       'width=1000px,height=400px'
     );
+
+    // const newWindow = window.open(
+    //   'http://localhost:3001/mpd/DatabasesMobitelProjects/AllMobitelOnAirData',
+    //   'Scope Details',
+    //   'width=1000px,height=400px'
+    // );
 
     newWindow.arrayData = mobitelTilesData.projectsOnAirData;
   };
