@@ -38,25 +38,41 @@ function DashboardApp() {
 
   // site engineer
   const [siteEngineerName, setSelectedSiteEngineer] = useState('All siteEngineers');
-
+  const [load,setLod] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [MobitelprojectNamesArray, setMobitelprojectNamesArray] = useState([0]);
   const [SiteEngineersName, setSiteEngineersName] = useState([0]);
   const [seletedSiteEngineerName, setSeletedSiteEngineerName] = useState('All siteEngineers');
   const [seletedMobitelProjectName, setSeletedMobitelProjectName] = useState('All Projects');
+  const [monthsDays, setMonthsDays] = useState()
 
   // mobitel projects last update
-  const fetchMobitelProjectsLastUpdates = () => {
-    axiosInstance
-      .get('/mobitelProjectsLastUpdates', {
-        params: { Engineer: siteEngineerName, Project: MobitelDropdownValue }
-      })
-      .then((res) => {
-        setMobitelLastUpdates(res.data.existingPosts);
+const fetchMobitelProjectsLastUpdates = async () => {
+  try {
+    const res = await axiosInstance.get('/mobitelProjectsLastUpdates', {
+      params: { Engineer: siteEngineerName, Project: MobitelDropdownValue }
+    });
+    setMobitelLastUpdates(res.data.existingPosts);
+    // console.log(res.data.existingPosts);
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching Mobitel projects last updates:', error);
+  }
+};
 
-        // console.log(res.data.existingPosts);
-      });
-  };
+
+  const getmonth = async () => {
+
+    try{
+      const res = await axiosInstance.get('/getMonth');
+setMonthsDays(res.data.monthDay)
+
+    } catch(error){
+          console.error('Error fetching Mobitel projects last updates:', error);
+
+    }
+
+  }
 
   const mobitelTilesDetails = useSelector((state) => state.mobileTilesData);
   const { mobitelTilesDataLoading, error, mobitelTilesData } = mobitelTilesDetails;
@@ -76,6 +92,7 @@ function DashboardApp() {
     // call mobitel name and site engineer name
     fetchMobitelProjectNames();
     getSiteEngineersNames();
+    getmonth();
 
     // call Tiles data and other chart
     dispatch(fetchMoitelTilesData(MobitelDropdownValue, siteEngineerName));
@@ -112,10 +129,13 @@ function DashboardApp() {
 
   const getDataForSiteEngineer = async () => {
     try {
+      console.log('true');
+setLod(true)
       const res = await axiosInstance.get('/siteEngineerForMonthlyWorkProgress', {
         params: { Engineer: seletedSiteEngineerName, Project: seletedMobitelProjectName }
       });
       setChartData(res.data.siteEnginnerForTask);
+setLod(false);
     } catch (error) {
       console.error('Error fetching data for site engineer:', error);
       // Handle error as needed, e.g., show a notification to the user
@@ -363,13 +383,7 @@ function DashboardApp() {
             </Grid>
           )}
 
-          {mobitelChartColumnLoading ? (
-            <Grid item xs={12} sm={6} md={2.4}>
-              <CircularProgress color="success" />
-            </Grid>
-          ) : mobitelChartColumDataError ? (
-            <h1>error...</h1>
-          ) : (
+        
             <Grid item xs={12} md={6} lg={12} mb={0}>
               <AppWebsiteVisits2
                 tableData={chartData}
@@ -379,10 +393,11 @@ function DashboardApp() {
                 project={seletedMobitelProjectName}
                 projectsName={MobitelprojectNamesArray}
                 siteEngineerName={SiteEngineersName}
-                xAxisDaysLabel={mobitelChartColumData?.SevenDaysOfWeek ?? []}
+                xAxisDaysLabel={monthsDays}
+                loaddata={load}
               />
             </Grid>
-          )}
+        
           <Grid item xs={12} md={6} lg={12} mb={0}>
             <Card style={{ height: '520px' }}>
               <Stack sx={{ p: 2 }} direction="row">

@@ -1132,4 +1132,43 @@ router.get("/siteEngineerForMonthlyWorkProgress", async (req, res, next) => {
   });
 });
 
+function getMonthsDate() {
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  let today = new Date();
+  let last30Days = [];
+
+  for (let i = 0; i < 30; i++) {
+    let date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+    let month = months[date.getMonth()];
+    let day = date.getDate();
+    last30Days.push(`${month} ${day}`);
+  }
+
+  const FinalLast30Day = last30Days.reverse();
+
+  // console.log(FinalLast30Day);
+  return FinalLast30Day;
+}
+
+router.get("/getMonth", async (req, res, next) => {
+  return res.status(200).json({
+    success: true,
+    monthDay: getMonthsDate(),
+  });
+});
+
 module.exports = router;

@@ -5,7 +5,17 @@ import { merge } from 'lodash';
 import ReactApexChart from 'react-apexcharts';
 
 // material
-import { Card, CardHeader, Box, Alert, Typography, Stack, TextField } from '@mui/material';
+import {
+  Card,
+  CardHeader,
+  Box,
+  Alert,
+  Typography,
+  Stack,
+  TextField,
+  Grid,
+  CircularProgress
+} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import Button from '@mui/material/Button';
@@ -25,7 +35,8 @@ export default function AppWebsiteVisits2({
   siteEngineerName,
   name,
   project,
-  xAxisDaysLabel
+  xAxisDaysLabel,
+  loaddata
 }) {
   const [alert1, setAlert1] = useState(false);
   const [alertContent1, setAlertContent1] = useState('');
@@ -131,7 +142,7 @@ export default function AppWebsiteVisits2({
 
   return (
     <Card>
-      <CardHeader title="Monthly Work Progress For SiteEnginner" />
+      <CardHeader title="Monthly Work Progress For SiteEnginners & Projects" />
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Typography variant="caption1" style={{ marginLeft: '23px' }}>
           Select Options
@@ -177,9 +188,16 @@ export default function AppWebsiteVisits2({
           </Stack>
         </Stack>
       </Stack>
-      <Box sx={{ p: 3, pb: 1 }} dir="ltr">
-        <ReactApexChart type="line" series={CHART_DATA} options={chartOptions} height={311} />
-      </Box>
+      {loaddata ? (
+        <Grid item xs={12} sm={6} md={2.4}>
+          <CircularProgress color="success" />
+        </Grid>
+      ) : (
+        <Box sx={{ p: 3, pb: 1 }} dir="ltr">
+          <ReactApexChart type="line" series={CHART_DATA} options={chartOptions} height={311} />
+        </Box>
+      )}
+
       <Box sx={{ width: '100%' }}>
         <Collapse in={open1}>
           {alert1 ? (
