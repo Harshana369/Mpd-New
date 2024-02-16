@@ -902,64 +902,6 @@ function getMonthlyProgressData(posts) {
   return weeklyProgressData;
 }
 
-function getMonthlyProgressDataForSiteEnginner(posts) {
-  var onairData = [];
-  var patData = [];
-  var commissionedData = [];
-
-  var lastWeekDates = [];
-  var currentDate = new Date();
-
-  for (var i = 0; i < 30; i++) {
-    var date = new Date(currentDate.getTime() - i * 24 * 60 * 60 * 1000);
-    var dateString = date.toISOString().split("T")[0];
-    lastWeekDates.push(dateString);
-  }
-
-  for (var i = 0; i < 30; i++) {
-    commissionedData[i] = posts.filter(
-      (obj) => obj.Commission === lastWeekDates[i]
-    ).length;
-  }
-
-  for (var i = 0; i < 30; i++) {
-    patData[i] = posts.filter(
-      (obj) => obj.PAT_Pass === lastWeekDates[i]
-    ).length;
-  }
-
-  for (var i = 0; i < 30; i++) {
-    onairData[i] = posts.filter(
-      (obj) => obj.On_air === lastWeekDates[i]
-    ).length;
-  }
-
-  let commissionedArray = commissionedData.reverse();
-  let patPassArray = patData.reverse();
-  let onAirArray = onairData.reverse();
-
-  let weeklyProgressData = [];
-  weeklyProgressData.push(
-    {
-      name: "Commissioned",
-      type: "column",
-      data: commissionedArray,
-    },
-    {
-      name: "PAT",
-      type: "column",
-      data: patPassArray,
-    },
-    {
-      name: "OnAir",
-      type: "column",
-      data: onAirArray,
-    }
-  );
-
-  //console.log(weeklyProgressData);
-  return weeklyProgressData;
-}
 //---------------------------------------------------------------------------------------------------------------------------
 //-------------- Function for 7 days of week for Front End Weekly Progress Graph of Mobitel Project Databases ---------------
 //---------------------------------------------------------------------------------------------------------------------------
@@ -1100,74 +1042,208 @@ router.put("/saveProjectOnlineData", async (req, res) => {
   });
 });
 
-router.get("/siteEngineerForMonthlyWorkProgress", async (req, res, next) => {
-  const { Project, Engineer } = req.query;
+router.get("/siteEngineerForMonthlyWorkProgressNew", async (req, res, next) => {
+  try {
+    const { selectedSiteEngineer, selectedProject, fromDate, toDate } =
+      req.query;
+    console.log("---");
+    console.log(fromDate);
+    console.log(toDate);
+    console.log("---");
 
-  console.log(Project, Engineer);
-  console.log("run 1");
-  let reqQuery = {};
+    // Find posts within the specified date range and for the selected site engineers and projects
+    const commissionObjects = await Posts.find({
+      Site_Engineer: { $in: selectedSiteEngineer },
+      Project: { $in: selectedProject },
+      $or: [{ $and: [{ Commission: { $gte: fromDate, $lte: toDate } }] }],
+    });
 
-  if (Project === "All Projects" && Engineer === "All siteEngineers") {
-    // return all data related to all Site_Engineers, without filtering by project
-    reqQuery = {};
-  } else if (Project === "All Projects") {
-    // return data related to the specified Site_Engineer for all projects
-    reqQuery = { Site_Engineer: Engineer };
-  } else if (Engineer === "All siteEngineers") {
-    // return data related to the specified Site_Engineer for all projects
-    reqQuery = { Project: Project };
-  } else {
-    // return data related to the specified project and Site_Engineer
-    reqQuery = { Project, Site_Engineer: Engineer };
+    // console.log("---com-----");
+    // console.log(commissionObjects);
+    // console.log("---com-----");
+
+    const patPassObjects = await Posts.find({
+      Site_Engineer: { $in: selectedSiteEngineer },
+      Project: { $in: selectedProject },
+      $or: [
+        {
+          $and: [{ PAT_Pass: { $gte: fromDate, $lte: toDate } }],
+        },
+      ],
+    });
+
+    // console.log("---pat----");
+    // console.log(patPassObjects);
+    // console.log("---pat-------");
+
+    const on_airObjects = await Posts.find({
+      Site_Engineer: { $in: selectedSiteEngineer },
+      Project: { $in: selectedProject },
+      $or: [{ $and: [{ On_air: { $gte: fromDate, $lte: toDate } }] }],
+    });
+
+    // console.log("------onair-----");
+    // console.log(on_airObjects);
+    // console.log("------onair-----");
+
+    // Count occurrences of each Site Engineer for each type
+    const countEngineers = (objects) => {
+      const engineerCount = {};
+      objects.forEach((obj) => {
+        if (engineerCount[obj.Site_Engineer]) {
+          engineerCount[obj.Site_Engineer]++;
+        } else {
+          engineerCount[obj.Site_Engineer] = 1;
+        }
+      });
+      return engineerCount;
+    };
+
+    const commissionCount = countEngineers(commissionObjects);
+    const patPassCount = countEngineers(patPassObjects);
+    const onAirCount = countEngineers(on_airObjects);
+
+    // console.log(commissionCount);
+    // console.log(patPassCount);
+    // console.log(onAirCount);
+
+    const FinalDataArray = [
+      {
+        name: "Commissioned",
+        type: "column",
+        data: selectedSiteEngineer.map(
+          (engineer) => commissionCount[engineer] || 0
+        ),
+      },
+      {
+        name: "PAT",
+        type: "column",
+        data: selectedSiteEngineer.map(
+          (engineer) => patPassCount[engineer] || 0
+        ),
+      },
+      {
+        name: "OnAir",
+        type: "column",
+        data: selectedSiteEngineer.map((engineer) => onAirCount[engineer] || 0),
+      },
+    ];
+
+    // console.log(FinalDataArray);
+
+    const firstNamesForSiteEnginners = selectedSiteEngineer.map(
+      (fullName) => fullName.split(" ")[0]
+    );
+
+    return res.status(200).json({
+      success: true,
+      FinalDataArray,
+      firstNamesForSiteEnginners,
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
+});
 
-  const temp = await Posts.find(reqQuery).exec();
+router.get("/siteEngineerForMonthlyWork", async (req, res, next) => {
+  try {
+    // Get the current date
+    const today = new Date();
 
-  const siteEnginnerForTask = getMonthlyProgressDataForSiteEnginner(temp);
+    // Calculate the date 30 days ago
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
 
-  // console.log(siteEnginnerForTask);
-  return res.status(200).json({
-    success: true,
-    siteEnginnerForTask,
+    // Find posts with commissions within the last 30 days for Dumindu Chamikara
+    const posts = await Posts.find(
+      {
+        Site_Engineer: "Ashan Shashika", // Filter by Site_Engineer
+        Commission: {
+          $gte: thirtyDaysAgo.toISOString(),
+          $lte: today.toISOString(),
+        },
+      },
+      { On_air: 1, _id: 0 } // Projection to include only Commission, PAT_Pass, and On_air fields
+    );
+
+    console.log("Number of posts within last 30 days:", posts.length);
+    res.json(posts); // Sending the posts as a response
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+router.get("/AllSiteEngineersNamesForMultipleTasksFilter", (req, res) => {
+  Posts.aggregate([
+    {
+      $group: {
+        _id: "$Site_Engineer",
+      },
+    },
+    {
+      $match: {
+        _id: { $ne: null },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        siteEngineer: "$_id",
+      },
+    },
+  ]).exec((err, uniqueSiteEngineers) => {
+    if (err) {
+      return res.status(400).json({
+        error: err,
+      });
+    }
+
+    const siteEngineersNamesArray = uniqueSiteEngineers.map(
+      (engineer) => engineer.siteEngineer
+    );
+
+    return res.status(200).json({
+      success: true,
+      siteEngineersNamesArray,
+    });
   });
 });
 
-function getMonthsDate() {
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+router.get("/AllProjectsNamesForMultipleTasksFilter", (req, res) => {
+  Posts.aggregate([
+    {
+      $group: {
+        _id: "$Project",
+      },
+    },
+    {
+      $match: {
+        _id: { $ne: null },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        projectName: "$_id",
+      },
+    },
+  ]).exec((err, uniqueProjects) => {
+    if (err) {
+      return res.status(400).json({
+        error: err,
+      });
+    }
 
-  let today = new Date();
-  let last30Days = [];
+    const ProjectsNamesArray = uniqueProjects.map(
+      (project) => project.projectName
+    );
 
-  for (let i = 0; i < 30; i++) {
-    let date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
-    let month = months[date.getMonth()];
-    let day = date.getDate();
-    last30Days.push(`${month} ${day}`);
-  }
-
-  const FinalLast30Day = last30Days.reverse();
-
-  // console.log(FinalLast30Day);
-  return FinalLast30Day;
-}
-
-router.get("/getMonth", async (req, res, next) => {
-  return res.status(200).json({
-    success: true,
-    monthDay: getMonthsDate(),
+    return res.status(200).json({
+      success: true,
+      ProjectsNamesArray,
+    });
   });
 });
 

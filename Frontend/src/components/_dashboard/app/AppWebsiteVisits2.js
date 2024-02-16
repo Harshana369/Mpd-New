@@ -80,7 +80,7 @@ export default function AppWebsiteVisits2({
         }
       }
     },
-    fill: { type: ['solid', 'gradient', 'solid'] },
+    fill: { type: ['solid', 'solid', 'solid'] },
     labels: xAxisData,
     xaxis: { type: 'day' },
     tooltip: {
@@ -147,7 +147,7 @@ export default function AppWebsiteVisits2({
         <Typography variant="caption1" style={{ marginLeft: '23px' }}>
           Select Options
         </Typography>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+        {/* <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
           <Stack
             direction="row"
             alignItems="center"
@@ -185,8 +185,9 @@ export default function AppWebsiteVisits2({
                 </MenuItem>
               ))}
             </TextField>
+            
           </Stack>
-        </Stack>
+        </Stack> */}
       </Stack>
       {loaddata ? (
         <Grid item xs={12} sm={6} md={2.4}>

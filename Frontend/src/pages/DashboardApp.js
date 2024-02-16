@@ -38,41 +38,27 @@ function DashboardApp() {
 
   // site engineer
   const [siteEngineerName, setSelectedSiteEngineer] = useState('All siteEngineers');
-  const [load,setLod] = useState(false);
+  const [load, setLod] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [MobitelprojectNamesArray, setMobitelprojectNamesArray] = useState([0]);
   const [SiteEngineersName, setSiteEngineersName] = useState([0]);
   const [seletedSiteEngineerName, setSeletedSiteEngineerName] = useState('All siteEngineers');
   const [seletedMobitelProjectName, setSeletedMobitelProjectName] = useState('All Projects');
-  const [monthsDays, setMonthsDays] = useState()
+  const [monthsDays, setMonthsDays] = useState();
 
   // mobitel projects last update
-const fetchMobitelProjectsLastUpdates = async () => {
-  try {
-    const res = await axiosInstance.get('/mobitelProjectsLastUpdates', {
-      params: { Engineer: siteEngineerName, Project: MobitelDropdownValue }
-    });
-    setMobitelLastUpdates(res.data.existingPosts);
-    // console.log(res.data.existingPosts);
-  } catch (error) {
-    // Handle errors here
-    console.error('Error fetching Mobitel projects last updates:', error);
-  }
-};
-
-
-  const getmonth = async () => {
-
-    try{
-      const res = await axiosInstance.get('/getMonth');
-setMonthsDays(res.data.monthDay)
-
-    } catch(error){
-          console.error('Error fetching Mobitel projects last updates:', error);
-
+  const fetchMobitelProjectsLastUpdates = async () => {
+    try {
+      const res = await axiosInstance.get('/mobitelProjectsLastUpdates', {
+        params: { Engineer: siteEngineerName, Project: MobitelDropdownValue }
+      });
+      setMobitelLastUpdates(res.data.existingPosts);
+      // console.log(res.data.existingPosts);
+    } catch (error) {
+      // Handle errors here
+      console.error('Error fetching Mobitel projects last updates:', error);
     }
-
-  }
+  };
 
   const mobitelTilesDetails = useSelector((state) => state.mobileTilesData);
   const { mobitelTilesDataLoading, error, mobitelTilesData } = mobitelTilesDetails;
@@ -92,7 +78,6 @@ setMonthsDays(res.data.monthDay)
     // call mobitel name and site engineer name
     fetchMobitelProjectNames();
     getSiteEngineersNames();
-    getmonth();
 
     // call Tiles data and other chart
     dispatch(fetchMoitelTilesData(MobitelDropdownValue, siteEngineerName));
@@ -127,20 +112,20 @@ setMonthsDays(res.data.monthDay)
 
   // =============================
 
-  const getDataForSiteEngineer = async () => {
-    try {
-      console.log('true');
-setLod(true)
-      const res = await axiosInstance.get('/siteEngineerForMonthlyWorkProgress', {
-        params: { Engineer: seletedSiteEngineerName, Project: seletedMobitelProjectName }
-      });
-      setChartData(res.data.siteEnginnerForTask);
-setLod(false);
-    } catch (error) {
-      console.error('Error fetching data for site engineer:', error);
-      // Handle error as needed, e.g., show a notification to the user
-    }
-  };
+  // const getDataForSiteEngineer = async () => {
+  //   try {
+  //     setLod(true);
+  //     const res = await axiosInstance.get('/siteEngineerForMonthlyWorkProgress', {
+  //       params: { Engineer: seletedSiteEngineerName, Project: seletedMobitelProjectName }
+  //     });
+  //     setChartData(res.data.returnData.siteEnginerForTask);
+  //     setMonthsDays(res.data.returnData.siteEngineerNames);
+  //     setLod(false);
+  //   } catch (error) {
+  //     console.error('Error fetching data for site engineer:', error);
+  //     // Handle error as needed, e.g., show a notification to the user
+  //   }
+  // };
 
   const getSiteEngineersNames = async () => {
     try {
@@ -170,13 +155,13 @@ setLod(false);
     fetchMobitelProjectNames();
   }, []);
 
-  useEffect(() => {
-    getDataForSiteEngineer();
-  }, [seletedSiteEngineerName]);
+  // useEffect(() => {
+  //   getDataForSiteEngineer();
+  // }, [seletedSiteEngineerName]);
 
-  useEffect(() => {
-    getDataForSiteEngineer();
-  }, [seletedMobitelProjectName]);
+  // useEffect(() => {
+  //   getDataForSiteEngineer();
+  // }, [seletedMobitelProjectName]);
 
   return (
     <Page title="Dashboard | Mobitel Projects Dashboard">
@@ -383,21 +368,20 @@ setLod(false);
             </Grid>
           )}
 
-        
-            <Grid item xs={12} md={6} lg={12} mb={0}>
-              <AppWebsiteVisits2
-                tableData={chartData}
-                setSEName={setSeletedSiteEngineerName}
-                name={seletedSiteEngineerName}
-                setPName={setSeletedMobitelProjectName}
-                project={seletedMobitelProjectName}
-                projectsName={MobitelprojectNamesArray}
-                siteEngineerName={SiteEngineersName}
-                xAxisDaysLabel={monthsDays}
-                loaddata={load}
-              />
-            </Grid>
-        
+          <Grid item xs={12} md={6} lg={12} mb={0}>
+            <AppWebsiteVisits2
+              tableData={chartData}
+              setSEName={setSeletedSiteEngineerName}
+              name={seletedSiteEngineerName}
+              setPName={setSeletedMobitelProjectName}
+              project={seletedMobitelProjectName}
+              projectsName={MobitelprojectNamesArray}
+              siteEngineerName={SiteEngineersName}
+              xAxisDaysLabel={monthsDays}
+              loaddata={load}
+            />
+          </Grid>
+
           <Grid item xs={12} md={6} lg={12} mb={0}>
             <Card style={{ height: '520px' }}>
               <Stack sx={{ p: 2 }} direction="row">
