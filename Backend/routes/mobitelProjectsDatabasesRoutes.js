@@ -1131,9 +1131,16 @@ router.get("/siteEngineerForMonthlyWorkProgressNew", async (req, res, next) => {
 
     // console.log(FinalDataArray);
 
-    const firstNamesForSiteEnginners = selectedSiteEngineer.map(
-      (fullName) => fullName.split(" ")[0]
-    );
+    const firstNamesForSiteEnginners = selectedSiteEngineer.map((fullName) => {
+      const names = fullName.split(" ");
+      if (names.length === 1) {
+        return names[0];
+      } else {
+        const [firstName, lastName] = names;
+        const lastInitial = lastName.charAt(0);
+        return `${firstName} ${lastInitial}`;
+      }
+    });
 
     return res.status(200).json({
       success: true,
@@ -1245,6 +1252,44 @@ router.get("/AllProjectsNamesForMultipleTasksFilter", (req, res) => {
       ProjectsNamesArray,
     });
   });
+});
+
+router.get("/test", (req, res) => {
+  const abc = [
+    "Supun Kularatne",
+    "Sahan Sandeep",
+    "Chamara Jayasanka",
+    "Dishan Ranathunga",
+    "Ashan Shashika",
+    "Ruwan Lakmal",
+    "Asanga Jayasooriya",
+    "Hasitha Amarawansha",
+    "Kasun Kandamulla",
+    "Randika Prabath",
+    "Shehan Perera",
+    "Yomal Kodagoda",
+    "A.T.M.Imran",
+    "Saminda Prasad",
+    "Prasath Jayawardhana",
+    "Suranga Bandara",
+    "Himantha Rajapakshe",
+    "Sampath Kaluarachchi",
+    "Suranga Gunawardhana",
+    "Dumindu Chamikara",
+  ];
+
+  const firstNameAndLastInitial = abc.map((fullName) => {
+    const names = fullName.split(" ");
+    if (names.length === 1) {
+      return names[0];
+    } else {
+      const [firstName, lastName] = names;
+      const lastInitial = lastName.charAt(0);
+      return `${firstName} ${lastInitial}`;
+    }
+  });
+
+  console.log(firstNameAndLastInitial);
 });
 
 module.exports = router;
